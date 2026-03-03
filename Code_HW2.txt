@@ -1,0 +1,40 @@
+I implemented the latency and consistency experiments in Python 3 using the requests library to send HTTP requests to the two VM instances. 
+I also used the time module to measure request latency and compute averages for the instances as:
+
+INSTANCE_1 = us-central1
+INSTANCE_2 = europe-west1
+
+The script is organized into two main parts:
+
+Function 1: Latency measurement
+
+For latency testing, I measured response times for both /register and /list endpoints on each instance.
+
+Implementation Details
+1. For each endpoint, I sent 10 requests per instance.
+2. For /register, I generated a unique username for each request based on time and loop counter: f"latency_user_{int(time.time()*1000)}_{i}"
+3. I measured latency using:
+
+start = time.time()
+response = requests.post(...)
+latency = (time.time() - start) * 1000 
+
+4. I stored latencies for each endpoint in a list and computed the average using: sum(latencies) / len(latencies)
+
+This allowed me to directly compare the average latency between the two geographic regions.
+
+---
+
+Function 2: Eventual consistency testing
+
+For the consistency test, I performed repeated write-then-read operations across regions as described in the Homework handout as follows:
+
+For each of 1000 iteration:
+
+1. Generate a unique username based on time and loop counter: f"consistency_user_{int(time.time()*1000)}_{i}"
+2. Send a POST /register request to one instance.
+3. Immediately send a GET /list request to the other instance.
+4. Check whether the username appears in the returned user list.
+5. Count how many times the username was not found.
+
+I ran 1000 iterations and tracked the number of misses to compute a consistency miss rate. I also tested this out for both instances - setting us-central1 as my write database and europe-west1 as my read database first and then vice versa. Both tests showed the same result.

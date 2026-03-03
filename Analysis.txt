@@ -1,0 +1,19 @@
+1. Latency Measurements
+
+/register
+Average Latency Measurement for us-central1 : 48.20ms
+Average Latency Measurement for europe-west1 : 426.90ms
+
+/list
+Average Latency Measurement for us-central1 : 50.10ms
+Average Latency Measurement for europe-west1 : 282.30ms
+
+2. Eventual Consistency Test
+
+Username was found every single time. 0 / 1000 misses.
+
+3. The latency differences are primarily due to geographic distance and network routing. Since I am currently physically located in the United States, requests to the us-central1 instance experience significantly lower round-trip time compared to europe-west1, which requires transatlantic network communication. Thus, the European instance shows substantially higher latency for both /register and /list.
+
+Additionally, /register in europe-west1 showed even higher latency differential than /list, likely because writes involve additional work such as database updates and possible replication overhead.
+
+In the eventual consistency experiment, I observed 0 misses out of 1000 attempts. This suggests that replication between the two instances is either very fast or effectively synchronous under my testing conditions. While the system may be designed with eventual consistency semantics for query reads, in practice the replication delay was not large enough to be observable. To observe replication lag, we could increase load on the same instance and try repeatedly querying the other to potentially observe some lag.
